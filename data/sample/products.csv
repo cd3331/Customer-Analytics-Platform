@@ -1,0 +1,21 @@
+product_id,product_name,category,subcategory,unit_cost,unit_price,margin_pct,supplier_id,in_stock,rating
+PROD001,Product 1,Electronics,Subcat_2,14.88,40.07,62.9,SUPP01,False,4.1
+PROD002,Product 2,Clothing,Subcat_3,95.24,176.06,45.9,SUPP02,False,3.8
+PROD003,Product 3,Home,Subcat_1,40.69,99.51,59.1,SUPP03,False,4.4
+PROD004,Product 4,Books,Subcat_2,98.69,197.7,50.1,SUPP04,True,4.5
+PROD005,Product 5,Sports,Subcat_3,36.12,64.94,44.4,SUPP05,True,3.6
+PROD006,Product 6,Electronics,Subcat_1,68.46,110.29,37.9,SUPP01,True,4.1
+PROD007,Product 7,Clothing,Subcat_2,5.68,15.67,63.8,SUPP02,True,4.4
+PROD008,Product 8,Home,Subcat_3,89.44,157.03,43.0,SUPP03,False,3.6
+PROD009,Product 9,Books,Subcat_1,21.27,60.64,64.9,SUPP04,False,3.3
+PROD010,Product 10,Sports,Subcat_2,92.31,201.48,54.2,SUPP05,False,4.0
+PROD011,Product 11,Electronics,Subcat_3,41.5,97.8,57.6,SUPP01,True,4.1
+PROD012,Product 12,Clothing,Subcat_1,18.64,42.63,56.3,SUPP02,False,4.0
+PROD013,Product 13,Home,Subcat_2,77.25,177.69,56.5,SUPP03,False,4.4
+PROD014,Product 14,Books,Subcat_3,6.97,13.29,47.6,SUPP04,False,3.8
+PROD015,Product 15,Sports,Subcat_1,32.14,72.86,55.9,SUPP05,False,4.7
+PROD016,Product 16,Electronics,Subcat_2,40.17,113.62,64.6,SUPP01,False,3.2
+PROD017,Product 17,Clothing,Subcat_3,44.85,91.67,51.1,SUPP02,False,3.7
+PROD018,Product 18,Home,Subcat_1,91.28,138.25,34.0,SUPP03,False,4.3
+PROD019,Product 19,Books,Subcat_2,68.79,151.67,54.6,SUPP04,True,4.2
+PROD020,Product 20,Sports,Subcat_3,80.4,136.87,41.3,SUPP05,False,3.8

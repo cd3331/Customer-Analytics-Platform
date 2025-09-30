@@ -1,0 +1,16 @@
+cost_alerts:
+  daily_limit: 0.5
+  monthly_limit: 5.0
+region: us-east-1
+services:
+  dynamodb:
+    free_tier_storage_gb: 25
+  lambda:
+    free_tier_gb_seconds: 400000
+    free_tier_requests: 1000000
+  rds:
+    free_tier_hours: 750
+    instance_class: db.t3.micro
+  s3:
+    bucket_name: customer-analytics-demo-20250916
+    free_tier_limit_gb: 5

@@ -1,0 +1,43 @@
+ALTERYX WORKFLOW FORMULAS - Customer Analytics Platform
+Created: December 19, 2024
+Alteryx Trial Expires: [Your expiry date]
+
+=== FORMULA #29: actual_revenue ===
+[unit_price] * [quantity] * (1 - [discount_pct]/100.0)
+
+=== FORMULA #31: days_since_transaction ===
+DateTimeDiff(DateTimeToday(), DateTimeParse([transaction_date], "%Y-%m-%d"), "days")
+
+=== FORMULA #32: customer_ltv ===
+[actual_revenue] + IIF(IsNull([campaign_revenue]), 0, [campaign_revenue])
+
+=== FORMULA #33: churn_flag ===
+IIF([days_since_transaction] > 90, 1, 0)
+
+=== FORMULA #34: customer_segment ===
+IIF([customer_ltv] > 1000 AND [days_since_transaction] <= 30, "High Value Active",
+    IIF([customer_ltv] > 1000, "High Value Inactive",
+        IIF([days_since_transaction] <= 30, "Low Value Active", 
+            "Low Value Inactive")))
+
+=== FORMULA #36: risk_score ===
+IIF([days_since_transaction] > 60 AND [total_conversions] = 0, "High Risk",
+    IIF([days_since_transaction] > 30, "Medium Risk", 
+        "Low Risk"))
+
+=== SQL QUERY (RDS Marketing Data) ===
+SELECT 
+    cr.customer_id,
+    COUNT(DISTINCT c.campaign_id) as total_campaigns,
+    SUM(CASE WHEN cr.clicked = 1 THEN 1 ELSE 0 END) as total_clicks,
+    SUM(CASE WHEN cr.converted = 1 THEN 1 ELSE 0 END) as total_conversions,
+    SUM(cr.revenue) as campaign_revenue,
+    AVG(cr.revenue) as avg_campaign_value
+FROM marketing_db.campaign_responses cr
+LEFT JOIN marketing_db.campaigns c ON cr.campaign_id = c.campaign_id
+GROUP BY cr.customer_id
+
+=== JOIN CONFIGURATIONS ===
+Join 1: transactions.customer_id = customers.customer_id (Inner)
+Join 2: result.product_id = products.product_id (Inner)
+Join 3: result.customer_id = marketing.customer_id (Left Outer)

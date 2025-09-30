@@ -1,0 +1,66 @@
+# Save as: scripts/recreate_alteryx_workflow.py
+"""
+This recreates the Alteryx workflow logic
+Run this if Alteryx access is lost
+"""
+
+import pandas as pd
+import pymysql
+from datetime import datetime
+
+# Step 1: Load data (same as Alteryx inputs)
+transactions = pd.read_csv('data/sample/transactions.csv')
+customers = pd.read_csv('data/sample/customers.csv')
+products = pd.read_csv('data/sample/products.csv')
+
+# Step 2: Load marketing data from RDS
+connection = pymysql.connect(
+    host='your-rds-endpoint',
+    user='admin',
+    password='your-password',
+    database='marketing_db'
+)
+marketing_query = """
+SELECT customer_id, 
+       COUNT(DISTINCT campaign_id) as total_campaigns,
+       SUM(CASE WHEN converted = 1 THEN 1 ELSE 0 END) as total_conversions,
+       SUM(revenue) as campaign_revenue
+FROM campaign_responses 
+GROUP BY customer_id
+"""
+marketing = pd.read_sql(marketing_query, connection)
+
+# Step 3: Replicate joins
+df = transactions.merge(customers, on='customer_id', how='inner')
+df = df.merge(products, on='product_id', how='inner')
+df = df.merge(marketing, on='customer_id', how='left')
+
+# Step 4: Calculate fields (same formulas as Alteryx)
+df['actual_revenue'] = df['unit_price'] * df['quantity'] * (1 - df['discount_pct']/100)
+df['days_since_transaction'] = (datetime.now() - pd.to_datetime(df['transaction_date'])).dt.days
+df['customer_ltv'] = df['actual_revenue'] + df['campaign_revenue'].fillna(0)
+df['churn_flag'] = (df['days_since_transaction'] > 90).astype(int)
+
+# Customer segment
+conditions = [
+    (df['customer_ltv'] > 1000) & (df['days_since_transaction'] <= 30),
+    (df['customer_ltv'] > 1000) & (df['days_since_transaction'] > 30),
+    (df['customer_ltv'] <= 1000) & (df['days_since_transaction'] <= 30)
+]
+choices = ['High Value Active', 'High Value Inactive', 'Low Value Active']
+df['customer_segment'] = pd.np.select(conditions, choices, default='Low Value Inactive')
+
+# Risk score
+risk_conditions = [
+    (df['days_since_transaction'] > 60) & (df['total_conversions'] == 0),
+    df['days_since_transaction'] > 30
+]
+risk_choices = ['High Risk', 'Medium Risk']
+df['risk_score'] = pd.np.select(risk_conditions, risk_choices, default='Low Risk')
+
+# Step 5: Save outputs
+df.to_csv('output/customer_360_analytics.csv', index=False)
+summary = df.groupby(['customer_segment', 'risk_score']).size().reset_index(name='count')
+summary.to_csv('output/summary_metrics.csv', index=False)
+
+print(f"Processing complete: {len(df)} records")
