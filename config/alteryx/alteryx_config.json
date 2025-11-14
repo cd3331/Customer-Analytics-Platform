@@ -1,0 +1,88 @@
+{
+  "alteryx_setup": {
+    "trial_url": "https://www.alteryx.com/designer-cloud-trial",
+    "duration": "30 days",
+    "steps": [
+      "1. Sign up at the URL above with business email",
+      "2. Verify email immediately",
+      "3. Log in to https://designercloud.alteryx.com",
+      "4. Configure AWS connections (see connections below)"
+    ]
+  },
+  "aws_connections": {
+    "s3_connection": {
+      "name": "CustomerAnalyticsS3",
+      "type": "Amazon S3",
+      "configuration": {
+        "accessKeyId": "YOUR_AWS_ACCESS_KEY_ID",
+        "secretAccessKey": "YOUR_AWS_SECRET_ACCESS_KEY",
+        "region": "us-east-1",
+        "bucket": "your-bucket-name"
+      }
+    },
+    "rds_connection": {
+      "name": "CustomerAnalyticsRDS",
+      "type": "MySQL",
+      "configuration": {
+        "host": "your-rds-endpoint.rds.amazonaws.com",
+        "port": 3306,
+        "database": "marketing_db",
+        "username": "admin",
+        "password": "YOUR_RDS_PASSWORD"
+      }
+    },
+    "athena_connection": {
+      "name": "CustomerAnalyticsAthena",
+      "type": "Amazon Athena",
+      "configuration": {
+        "workgroup": "primary",
+        "database": "customer_analytics_db",
+        "s3OutputLocation": "s3://your-bucket-name/athena-results/"
+      }
+    }
+  },
+  "workflow_template": {
+    "name": "Customer_360_Analytics",
+    "description": "End-to-end customer analytics workflow",
+    "tools": [
+      {
+        "step": 1,
+        "tool": "Input Data",
+        "source": "S3",
+        "path": "data/sales/sales_data.csv"
+      },
+      {
+        "step": 2,
+        "tool": "Input Data",
+        "source": "RDS MySQL",
+        "query": "SELECT * FROM campaign_responses"
+      },
+      {
+        "step": 3,
+        "tool": "Join",
+        "type": "Inner Join",
+        "key": "customer_id"
+      },
+      {
+        "step": 4,
+        "tool": "Formula",
+        "calculations": [
+          "CLV = [total_purchases] * [avg_order_value]",
+          "Churn_Risk = IF [days_since_purchase] > 60 THEN 'High' ELSE 'Low' ENDIF"
+        ]
+      },
+      {
+        "step": 5,
+        "tool": "Predictive",
+        "model": "Classification",
+        "target": "churn_flag"
+      },
+      {
+        "step": 6,
+        "tool": "Output Data",
+        "destination": "S3",
+        "path": "output/customer_360.csv"
+      }
+    ]
+  }
+}

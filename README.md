@@ -84,6 +84,8 @@ DynamoDB ─────────┘                            │          
    ```
 
 6. **Configure Alteryx**
+   - Follow the detailed instructions in [docs/alteryx_workflow_instructions.md](docs/alteryx_workflow_instructions.md)
+   - Or run the setup helper:
    ```bash
    python scripts/alteryx_setup.py
    ```
@@ -91,16 +93,38 @@ DynamoDB ─────────┘                            │          
 ## 📁 Repository Structure
 ```
 customer-analytics-platform/
-├── dashboard/              # Web dashboard (HTML/JS)
-├── scripts/               # Python automation scripts
-│   ├── data-generation/   # Sample data creation
-│   ├── etl/              # Data processing
-│   └── monitoring/       # Cost tracking
-├── data/                 # Sample datasets
-│   └── sample/          # CSV files (customers, transactions, products)
-├── config/              # Service configurations
-├── docs/               # Documentation
-└── aws/               # AWS Lambda functions
+├── dashboard/                    # Web dashboard (HTML/JS)
+├── scripts/                      # Python automation scripts
+│   ├── data-generation/         # Sample data creation
+│   │   └── generate_sample_data.py
+│   ├── etl/                     # Data processing (Alteryx workflows)
+│   ├── ml-models/               # Machine learning models
+│   │   └── churn_prediction.py
+│   ├── monitoring/              # Cost tracking
+│   ├── aws_s3_setup.py          # S3 bucket setup
+│   ├── aws_rds_setup.py         # RDS database setup
+│   ├── aws_lambda_setup.py      # Lambda deployment
+│   ├── aws_dynamodb_setup.py    # DynamoDB setup
+│   └── alteryx_setup.py         # Alteryx configuration
+├── data/                        # Sample datasets
+│   └── sample/                  # CSV files (customers, transactions, products)
+├── config/                      # Service configurations
+│   ├── aws/                     # AWS service configs (S3, RDS, Lambda, DynamoDB)
+│   └── alteryx/                 # Alteryx workflow configs
+├── docs/                        # Documentation
+│   ├── architecture/            # System architecture docs
+│   │   └── architecture.md
+│   ├── alteryx_workflow_instructions.md
+│   ├── troubleshooting.md       # Common issues and solutions
+│   └── api_reference.md         # API documentation
+├── aws/                         # AWS Lambda functions
+│   └── lambda/
+│       ├── customer-analytics-api/
+│       └── customer-analytics-processor/
+├── powerbi/                     # Power BI dashboard files
+├── alteryx/                     # Alteryx workflow exports
+├── tests/                       # Test suite
+└── requirements.txt             # Python dependencies
 ```
 
 ## 🛠️ Technology Stack
@@ -238,29 +262,51 @@ pytest tests/test_aws_setup.py
 
 ### Generate Sample Data
 ```bash
-# Generate customer data for last 12 months
-python scripts/data-generation/generate_sample_data.py --months 12 --customers 10000
-
-# Generate specific data types
-python scripts/data-generation/generate_sample_data.py --data-type sales,behavior,support
+# Generate sample customer, transaction, and product data
+python scripts/data-generation/generate_sample_data.py
 ```
+
+The script generates:
+- `data/sample/customers.csv` - 100 customer records
+- `data/sample/transactions.csv` - 500 transaction records
+- `data/sample/products.csv` - 20 product records
+- `data/sample/generation_summary.json` - Generation statistics
 
 ### Run ETL Pipeline
-```bash
-# Full ETL pipeline
-python scripts/etl/aws_data_pipeline.py
+The ETL pipeline is implemented using Alteryx Designer Cloud. Follow these steps:
 
-# Process specific data source
-python scripts/etl/aws_data_pipeline.py --source sales --target processed
+1. Open Alteryx Designer Cloud
+2. Import the workflow from `alteryx/` directory
+3. Configure AWS connections (S3, RDS, DynamoDB)
+4. Run the workflow to process data
+
+For detailed instructions, see [docs/alteryx_workflow_instructions.md](docs/alteryx_workflow_instructions.md)
+
+### Test Lambda Functions
+```bash
+# Test the Lambda API locally
+python scripts/test_lambda.py
+
+# Or invoke deployed Lambda
+aws lambda invoke --function-name customer-analytics-api response.json
+
+# View the response
+cat response.json
 ```
 
-### Monitor Costs
+### Monitor AWS Resources
 ```bash
-# Check current AWS costs
-python scripts/monitoring/cost_monitor.py
+# Check S3 bucket contents
+aws s3 ls s3://your-bucket-name/data/
 
-# Set cost alerts
-python scripts/monitoring/cost_monitor.py --alert --threshold 4.00
+# Check RDS instance status
+aws rds describe-db-instances --db-instance-identifier customer-analytics-db
+
+# Check DynamoDB table
+aws dynamodb describe-table --table-name customer-behavior-events
+
+# View Lambda function logs
+aws logs tail /aws/lambda/customer-analytics-api --follow
 ```
 
 ## 🚀 Deployment
@@ -272,8 +318,8 @@ python scripts/monitoring/cost_monitor.py --alert --threshold 4.00
 4. **Monitoring Setup**: Configure CloudWatch alarms and logging
 5. **Backup Strategy**: Implement automated backup procedures
 
-### CI/CD Pipeline
-GitHub Actions workflow included for:
+### CI/CD Pipeline (Planned)
+Future enhancements will include GitHub Actions workflows for:
 - Automated testing on pull requests
 - Code quality checks (linting, security)
 - Deployment to staging/production environments
@@ -282,10 +328,10 @@ GitHub Actions workflow included for:
 ## 📚 Documentation
 
 Comprehensive documentation available in the `docs/` directory:
-- `docs/architecture/`: System architecture and design decisions
-- `docs/alteryx_workflow_instructions.md`: Alteryx setup and configuration
-- `docs/troubleshooting.md`: Common issues and solutions
-- `docs/api_reference.md`: API documentation for custom scripts
+- **[docs/architecture/architecture.md](docs/architecture/architecture.md)**: System architecture and design decisions
+- **[docs/alteryx_workflow_instructions.md](docs/alteryx_workflow_instructions.md)**: Alteryx setup and configuration
+- **[docs/troubleshooting.md](docs/troubleshooting.md)**: Common issues and solutions
+- **[docs/api_reference.md](docs/api_reference.md)**: Lambda API documentation and examples
 
 ## 🤝 Contributing
 

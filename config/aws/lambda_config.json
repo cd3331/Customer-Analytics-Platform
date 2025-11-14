@@ -1,0 +1,11 @@
+{
+  "functions": {
+    "processor": "customer-analytics-processor",
+    "api": "customer-analytics-api"
+  },
+  "region": "us-east-1",
+  "runtime": "python3.11",
+  "memory_size": 256,
+  "timeout": 60,
+  "created_at": "YYYY-MM-DDTHH:MM:SS.ssssss"
+}

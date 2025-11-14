@@ -22,7 +22,9 @@ venv.bak/
 *.csv
 *.parquet
 *.xlsx
-*.json
+# Ignore data JSON files but keep config files
+data/**/*.json
+!data/sample/generation_summary.json
 data/raw/*
 data/processed/*
 !data/sample/*
@@ -37,6 +39,9 @@ outputs/*
 *credentials*
 *secrets*
 config/aws/credentials
+# Ignore local config files with real credentials
+config/**/*.local.json
+config/**/*_local.json
 *.log
 logs/
 *.pbix.bak

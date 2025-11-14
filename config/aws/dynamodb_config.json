@@ -1,0 +1,9 @@
+{
+  "table_name": "customer-behavior-events",
+  "region": "us-east-1",
+  "created_at": "YYYY-MM-DDTHH:MM:SS.ssssss",
+  "key_schema": {
+    "partition_key": "customer_id",
+    "sort_key": "timestamp"
+  }
+}

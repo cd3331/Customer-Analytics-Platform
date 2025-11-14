@@ -1,0 +1,9 @@
+{
+  "db_instance_id": "customer-analytics-db-YYYYMMDD",
+  "endpoint": "your-rds-endpoint.rds.amazonaws.com",
+  "port": 3306,
+  "database": "marketing_db",
+  "username": "admin",
+  "password": "YOUR_RDS_PASSWORD",
+  "created_at": "YYYY-MM-DDTHH:MM:SS.ssssss"
+}
